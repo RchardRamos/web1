@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Carrito</title>
+  <link rel="stylesheet" href="estilos.css" />
+  <style>
+    body {
+      background-image: url('img/banner.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: rgba(0, 0, 0, 0.85);
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      color: white;
+      margin: 0;
+      font-size: 28px;
+    }
+
+    nav {
+      margin-top: 10px;
+    }
+
+    nav a {
+      color: white;
+      margin-right: 15px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #ffd700;
+    }
+
+    #btn-cerrar-sesion {
+      background-color: #cc0000;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .carrito-container {
+      padding: 30px;
+    }
+
+    .carrito-container h2 {
+      color: white;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 32px;
+    }
+
+    #lista-carrito {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 25px;
+    }
+
+    .carrito-card {
+      background-color: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(6px);
+      border-radius: 15px;
+      padding: 15px;
+      color: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .carrito-card img {
+      width: auto;
+      max-width: 90%;
+      height: 120px;
+      object-fit: contain;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background-color: rgba(255, 255, 255, 0.05);
+      align-self: center;
+    }
+
+    .carrito-card h3 {
+      margin: 8px 0 4px;
+      font-size: 18px;
+      text-align: left;
+    }
+
+    .linea-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin: 4px 0;
+      font-size: 14px;
+    }
+
+    .acciones-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      width: 100%;
+    }
+
+    .acciones-card label {
+      margin-right: 5px;
+    }
+
+    .acciones-card input[type="number"] {
+      width: 60px;
+      padding: 4px;
+      border-radius: 5px;
+      border: none;
+      text-align: center;
+    }
+
+    .acciones-card button {
+      background-color: #dc3545;
+      color: white;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .acciones-card button:hover {
+      background-color: #c82333;
+    }
+
+    .acciones {
+      text-align: center;
+      margin: 20px auto 40px auto;
+      max-width: 600px;
+    }
+
+    .acciones button {
+      background-color: #dc3545;
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 0 15px;
+      min-width: 120px;
+      transition: background-color 0.3s;
+    }
+
+    .acciones button:hover {
+      background-color: #c82333;
+    }
+
+    /* Ocultamos el total general que estaba arriba */
+    .total {
+      display: none;
+    }
+
+    footer {
+      background-color: rgba(0, 0, 0, 0.75);
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    /* Estilos modal y formulario */
+    #modal-pago {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #modal-pago > div {
+      background-image: url('img/tarjetas.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      padding: 30px 30px 40px 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(0,0,0,0.7);
+      backdrop-filter: brightness(0.9);
+    }
+
+    #modal-pago > div h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      text-shadow: 0 0 5px rgba(0,0,0,0.7);
+    }
+
+    #form-pago input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    #form-pago .flex-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    #form-pago .flex-row input {
+      padding: 8px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    #expiracion {
+      flex: 2;
+    }
+
+    #cvv {
+      flex: 1;
+      max-width: 100px;
+    }
+
+    #tipo-tarjeta {
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 10px;
+      min-height: 20px;
+      text-shadow: 0 0 4px rgba(0,0,0,0.7);
+    }
+
+    #form-pago button {
+      background-color: #28a745;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      transition: background-color 0.3s;
+    }
+
+    #form-pago button:hover {
+      background-color: #218838;
+    }
+
+    #form-pago button.cancelar {
+      background: #ccc;
+      color: #333;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    /* Estilos para la factura detallada */
+    #factura {
+      display: none;
+      background-color: rgba(255,255,255,0.95);
+      padding: 20px;
+      margin: 40px auto;
+      max-width: 600px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      color: #333;
+      clear: both;
+    }
+    #factura h2 {
+      text-align: center;
+      color: #222;
+      margin-top: 0;
+    }
+    #factura p {
+      margin: 6px 0;
+      text-align: right;
+    }
+    /* Solo los valores a la derecha */
+    .factura-linea {
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Tienda Virtual de Bebidas Artesanales</h1>
+  <nav>
+    <a href="index.html">Inicio</a>
+    <span id="nombre-usuario" style="color: orange; font-weight: bold; margin-left: 10px;"></span>
+    <a href="#" id="link-login" onclick="redirigirALogin()">Iniciar Sesión</a>
+    <a href="#" id="link-registro" onclick="redirigirARegistro()">Crear Cuenta</a>
+    <a href="productos.html">Productos</a>
+    <a href="contacto.html">Contacto</a>
+    <a href="carrito.html">🛒 Carrito</a>
+    <button id="btn-cerrar-sesion" onclick="cerrarSesion()">Cerrar Sesión</button>
+  </nav>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</header>
+
+<main>
+  <section class="carrito-container">
+    <h2>Tu Carrito</h2>
+    <div id="lista-carrito"></div>
+  </section>
+
+  <section id="factura">
+    <h2>Factura Detallada</h2>
+    <div id="factura-detalle"></div>
+    <hr>
+    <div class="factura-linea"><span>Subtotal:</span><span id="factura-subtotal"></span></div>
+    <div class="factura-linea"><span>IVA (15%):</span><span id="factura-iva"></span></div>
+    <div class="factura-linea"><span>Total a Pagar:</span><span id="factura-total"></span></div>
+  </section>
+
+  <div class="acciones">
+    <button onclick="vaciarCarrito()">Vaciar Carrito</button>
+    <button onclick="pagarCarrito()">Pagar</button>
+  </div>
+
+  <!-- Modal de Pago -->
+  <div id="modal-pago">
+    <div>
+      <h2>Formulario de Pago</h2>
+      <form id="form-pago" novalidate>
+        <input type="text" id="nombre-tarjeta" placeholder="Nombre en la Tarjeta" required autocomplete="cc-name" />
+        <input type="text" id="numero-tarjeta" placeholder="Número de Tarjeta (16 dígitos)" maxlength="19" autocomplete="cc-number" required />
+        <div id="tipo-tarjeta"></div>
+        <div class="flex-row">
+          <input type="text" id="expiracion" placeholder="MM/AA" maxlength="5" required autocomplete="cc-exp" />
+          <input type="text" id="cvv" placeholder="CVV" maxlength="4" required autocomplete="cc-csc" />
+        </div>
+        <button type="submit">Confirmar Pago</button>
+        <button type="button" class="cancelar" onclick="cerrarFormularioPago()">Cancelar</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>© 2025 Tienda Virtual de Bebidas Alcohólicas. Todos los derechos reservados. RICARDO RAMOS</p>
+</footer>
+
+<script>
+  const { jsPDF } = window.jspdf;
+
+  // Función para decodificar JWT y obtener payload
+  function parseJwt(token) {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Debes iniciar sesión para acceder a esta página.");
+      window.location.href = "index.html";
+      return;
+    }
+
+    if (token) {
+      document.getElementById("btn-cerrar-sesion").style.display = "inline-block";
+      document.getElementById("link-login").style.display = "none";
+      document.getElementById("link-registro").style.display = "none";
+    }
+
+    const nombreUsuarioSpan = document.getElementById("nombre-usuario");
+    const btnCerrarSesion = document.getElementById("btn-cerrar-sesion");
+    const linkLogin = document.getElementById("link-login");
+    const linkRegistro = document.getElementById("link-registro");
+
+    const payload = parseJwt(token);
+    const nombreUsuario = payload?.username || payload?.sub || payload?.email || "Usuario";
+
+    nombreUsuarioSpan.textContent = `| Bienvenido, ${nombreUsuario}`;
+
+    btnCerrarSesion.style.display = "inline-block";
+    linkLogin.style.display = "none";
+    linkRegistro.style.display = "none";
+
+    mostrarCarrito();
+
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    if (carrito.length > 0) {
+      mostrarFactura(carrito);
+    }
+  });
+
+  function mostrarCarrito() {
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    const contenedor = document.getElementById("lista-carrito");
+    contenedor.innerHTML = "";
+
+    if (carrito.length === 0) {
+      contenedor.innerHTML = "<p style='color:white; text-align:center;'>Tu carrito está vacío.</p>";
+      document.getElementById("factura").style.display = "none";
+      return;
+    }
+
+    carrito.forEach((producto, index) => {
+      const subtotal = producto.precio * producto.cantidad;
+      const div = document.createElement("div");
+      div.className = "carrito-card";
+      div.innerHTML = `
+        <img src="${producto.imagen}" alt="${producto.nombre}">
+        <h3>${producto.nombre}</h3>
+        <div class="linea-flex">
+          <span>Precio:</span>
+          <span>$${producto.precio.toFixed(2)}</span>
+        </div>
+        <div class="linea-flex">
+          <span>Subtotal:</span>
+          <span>$${subtotal.toFixed(2)}</span>
+        </div>
+        <div class="acciones-card">
+          <label for="cantidad-${index}">Cant:</label>
+          <input type="number" id="cantidad-${index}" min="1" value="${producto.cantidad}" onchange="actualizarCantidad(${index})">
+          <button onclick="eliminarProducto(${index})">Eliminar</button>
+        </div>
+      `;
+      contenedor.appendChild(div);
+    });
+  }
+
+  function actualizarCantidad(index) {
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    const inputCantidad = document.getElementById(`cantidad-${index}`);
+    const nuevaCantidad = parseInt(inputCantidad.value);
+
+    if (nuevaCantidad < 1 || isNaN(nuevaCantidad)) {
+      alert("Cantidad inválida");
+      mostrarCarrito();
+      return;
+    }
+
+    carrito[index].cantidad = nuevaCantidad;
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    mostrarCarrito();
+    mostrarFactura(carrito);
+  }
+
+  function eliminarProducto(index) {
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    carrito.splice(index, 1);
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    mostrarCarrito();
+    mostrarFactura(carrito);
+  }
+
+  function vaciarCarrito() {
+    if (confirm("¿Deseas vaciar el carrito?")) {
+      localStorage.removeItem("carrito");
+      mostrarCarrito();
+      ocultarFactura();
+    }
+  }
+
+  function mostrarFormularioPago() {
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    if (carrito.length === 0) {
+      alert("Tu carrito está vacío. Agrega productos antes de pagar.");
+      return;
+    }
+    document.getElementById("modal-pago").style.display = "flex";
+  }
+
+  function cerrarFormularioPago() {
+    document.getElementById("modal-pago").style.display = "none";
+    limpiarFormularioPago();
+  }
+
+  function limpiarFormularioPago() {
+    document.getElementById("form-pago").reset();
+    document.getElementById("tipo-tarjeta").textContent = "";
+  }
+
+  function validarLuhn(numero) {
+    let suma = 0;
+    let alternar = false;
+    for (let i = numero.length - 1; i >= 0; i--) {
+      let n = parseInt(numero.charAt(i), 10);
+      if (alternar) {
+        n *= 2;
+        if (n > 9) n -= 9;
+      }
+      suma += n;
+      alternar = !alternar;
+    }
+    return (suma % 10) === 0;
+  }
+
+  function detectarTipoTarjeta(numero) {
+    const re = {
+      visa: /^4/,
+      mastercard: /^5[1-5]/,
+      amex: /^3[47]/,
+      diners: /^3(?:0[0-5]|[68])/,
+      discover: /^6(?:011|5)/,
+      jcb: /^(?:2131|1800|35)/
+    };
+
+    if (re.visa.test(numero)) return "Visa";
+    if (re.mastercard.test(numero)) return "Mastercard";
+    if (re.amex.test(numero)) return "American Express";
+    if (re.diners.test(numero)) return "Diners Club";
+    if (re.discover.test(numero)) return "Discover";
+    if (re.jcb.test(numero)) return "JCB";
+    return "Tipo de tarjeta desconocido";
+  }
+
+  function validarFechaExpiracion(exp) {
+    if (!/^\d{2}\/\d{2}$/.test(exp)) return false;
+    const [mes, anio] = exp.split("/").map(x => parseInt(x, 10));
+    if (mes < 1 || mes > 12) return false;
+
+    const fechaActual = new Date();
+    const anioActual = parseInt(fechaActual.getFullYear().toString().slice(-2));
+    const mesActual = fechaActual.getMonth() + 1;
+
+    if (anio < anioActual) return false;
+    if (anio === anioActual && mes < mesActual) return false;
+
+    return true;
+  }
+
+  document.getElementById("numero-tarjeta").addEventListener("input", function () {
+    let valor = this.value.replace(/\s+/g, "");
+    if (valor.length === 0) {
+      document.getElementById("tipo-tarjeta").textContent = "";
+      return;
+    }
+    const tipo = detectarTipoTarjeta(valor);
+    document.getElementById("tipo-tarjeta").textContent = `Tipo: ${tipo}`;
+  });
+
+  document.getElementById("form-pago").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const nombreTarjeta = document.getElementById("nombre-tarjeta").value.trim();
+    let numeroTarjeta = document.getElementById("numero-tarjeta").value.trim().replace(/\s+/g, "");
+    const expiracion = document.getElementById("expiracion").value.trim();
+    const cvv = document.getElementById("cvv").value.trim();
+
+    if (!nombreTarjeta) {
+      alert("Por favor, ingresa el nombre en la tarjeta.");
+      return;
+    }
+
+    if (!/^\d{16}$/.test(numeroTarjeta)) {
+      alert("Número de tarjeta inválido. Debe contener 16 dígitos.");
+      return;
+    }
+
+    if (!validarLuhn(numeroTarjeta)) {
+      alert("Número de tarjeta inválido.");
+      return;
+    }
+
+    if (!validarFechaExpiracion(expiracion)) {
+      alert("Fecha de expiración inválida o caducada. Formato MM/AA.");
+      return;
+    }
+
+    if (!/^\d{3,4}$/.test(cvv)) {
+      alert("CVV inválido.");
+      return;
+    }
+
+    // Simular procesamiento de pago
+    alert("Pago realizado con éxito. Gracias por tu compra. Tu compra llegará en 15 días laborables.");
+
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    if (carrito.length === 0) {
+      alert("Carrito vacío.");
+      cerrarFormularioPago();
+      return;
+    }
+
+    // Obtener nombre usuario del token para la factura
+    const token = localStorage.getItem("token");
+    const payload = parseJwt(token);
+    const nombreUsuario = payload?.username || payload?.sub || payload?.email || "Usuario";
+
+    // Generar PDF factura con nombre usuario
+    await generarPDFFactura(carrito, nombreUsuario);
+
+    // Limpiar carrito y actualizar UI
+    localStorage.removeItem("carrito");
+    mostrarCarrito();
+    cerrarFormularioPago();
+    ocultarFactura();
+  });
+
+  function mostrarFactura(carrito) {
+    const factura = document.getElementById("factura");
+    const detalle = document.getElementById("factura-detalle");
+    const subtotalP = document.getElementById("factura-subtotal");
+    const ivaP = document.getElementById("factura-iva");
+    const totalP = document.getElementById("factura-total");
+
+    factura.style.display = "block";
+
+    detalle.innerHTML = "";
+    let subtotal = 0;
+
+    carrito.forEach(prod => {
+      const sub = prod.precio * prod.cantidad;
+      subtotal += sub;
+      detalle.innerHTML += `
+        <p><strong>${prod.nombre}</strong>: ${prod.cantidad} x $${prod.precio.toFixed(2)} = $${sub.toFixed(2)}</p>
+      `;
+    });
+
+    const iva = subtotal * 0.15;
+    const total = subtotal + iva;
+
+    subtotalP.textContent = `$${subtotal.toFixed(2)}`;
+    ivaP.textContent = `${iva.toFixed(2)}`;
+    totalP.textContent = `$${total.toFixed(2)}`;
+  }
+
+  function ocultarFactura() {
+    const factura = document.getElementById("factura");
+    factura.style.display = "none";
+  }
+
+  function pagarCarrito() {
+    mostrarFormularioPago();
+  }
+
+  function cerrarSesion() {
+    localStorage.removeItem("token");
+    alert("Sesión cerrada.");
+    window.location.href = "index.html";
+  }
+
+  function redirigirALogin() {
+    window.location.href = "login.html";
+  }
+
+  function redirigirARegistro() {
+    window.location.href = "registro.html";
+  }
+
+  async function generarPDFFactura(carrito, nombreUsuario) {
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text("Factura - Tienda Virtual de Bebidas Artesanales", 14, 20);
+
+    const fecha = new Date();
+    doc.setFontSize(12);
+    doc.text(`Fecha: ${fecha.toLocaleDateString()} ${fecha.toLocaleTimeString()}`, 14, 30);
+
+    doc.setFont(undefined, 'bold');
+    doc.text(`Cliente: ${nombreUsuario}`, 14, 40);
+
+    doc.text("Producto", 14, 50);
+    doc.text("Cant.", 110, 50);
+    doc.text("Precio U.", 140, 50);
+    doc.text("Subtotal", 180, 50);
+    doc.setFont(undefined, 'normal');
+
+    let y = 57;
+    let subtotal = 0;
+    carrito.forEach(prod => {
+      const sub = prod.precio * prod.cantidad;
+      subtotal += sub;
+
+      const nombreProd = prod.nombre.length > 30 ? prod.nombre.substring(0, 27) + "..." : prod.nombre;
+
+      doc.text(nombreProd, 14, y);
+      doc.text(prod.cantidad.toString(), 115, y);
+      doc.text(`$${prod.precio.toFixed(2)}`, 145, y);
+      doc.text(`$${sub.toFixed(2)}`, 185, y);
+
+      y += 8;
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+    });
+
+    const iva = subtotal * 0.15;
+    const total = subtotal + iva;
+
+    y += 10;
+    doc.setFont(undefined, 'bold');
+    doc.text(`Subtotal: $${subtotal.toFixed(2)}`, 140, y);
+    y += 8;
+    doc.text(`IVA (15%): $${iva.toFixed(2)}`, 140, y);
+    y += 8;
+    doc.text(`Total a Pagar: $${total.toFixed(2)}`, 140, y);
+    doc.setFont(undefined, 'normal');
+
+    doc.save(`Factura_${fecha.getFullYear()}${fecha.getMonth() + 1}${fecha.getDate()}_${fecha.getHours()}${fecha.getMinutes()}${fecha.getSeconds()}.pdf`);
+  }
+</script>

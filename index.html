@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inicio</title>
+  <link rel="stylesheet" href="estilos.css" />
+  <style>
+    body {
+      background-image: url('img/banner.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: rgba(0, 0, 0, 0.85);
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    nav a, nav button {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    nav button {
+      background-color: #cc0000;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    nav button:hover {
+      background-color: #a30000;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #1c1c1c;
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 15px black;
+      text-align: center;
+    }
+
+    .modal-content h2 {
+      margin-bottom: 20px;
+    }
+
+    .modal-content label {
+      display: block;
+      text-align: left;
+      margin: 10px 0 5px 5%;
+    }
+
+    .modal-content input {
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background-color: #f5f5f5;
+      color: black;
+    }
+
+    .modal-content button {
+      padding: 10px 20px;
+      background-color: orange;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .modal-content button:hover {
+      background-color: darkorange;
+    }
+
+    .close {
+      float: right;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .oculto {
+      display: none !important;
+    }
+
+    main {
+      text-align: center;
+      color: white;
+      padding: 50px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Tienda Virtual de Bebidas Artesanales</h1>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <span id="usuarioLogueado" style="color: orange; font-weight: bold; margin-left: 10px;"></span>
+      <a id="btnLogin" onclick="redirigirALogin()">Iniciar Sesión</a>
+      <a id="btnRegistro" onclick="redirigirARegistro()">Crear Cuenta</a>
+      <a href="productos.html">Productos</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="carrito.html">🛒 Carrito</a>
+      <button id="cerrarSesionBtn" onclick="cerrarSesion()" style="display: none;">Cerrar Sesión</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Bienvenido a la Tienda Virtual de Bebidas Artesanales</h2>
+    <p>Selecciona una opción del menú para comenzar.</p>
+  </main>
+
+  <!-- Modal de inicio de sesión -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarLoginModal()">&times;</span>
+      <h2>Iniciar Sesión</h2>
+      <form id="login-form">
+        <label for="username">Nombre de usuario:</label>
+        <input type="text" id="username" placeholder="Ej: ricardo123" required>
+
+        <label for="password">Contraseña:</label>
+        <input type="password" id="password" placeholder="Contraseña" required>
+
+        <button type="submit">Ingresar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de registro -->
+  <div id="registroModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarRegistroModal()">&times;</span>
+      <h2>Crear Cuenta</h2>
+      <form id="registro-form">
+        <label for="nuevo-username">Nombre de usuario:</label>
+        <input type="text" id="nuevo-username" placeholder="Ej: juanito456" required>
+
+        <label for="nuevo-email">Correo electrónico:</label>
+        <input type="email" id="nuevo-email" placeholder="Ej: juanito@mail.com" required>
+
+        <label for="nuevo-password">Contraseña:</label>
+        <input type="password" id="nuevo-password" placeholder="Contraseña" required>
+
+        <button type="submit">Registrarse</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function mostrarLoginModal() {
+      document.getElementById("loginModal").style.display = "flex";
+    }
+
+    function cerrarLoginModal() {
+      document.getElementById("loginModal").style.display = "none";
+    }
+
+    function mostrarRegistroModal() {
+      document.getElementById("registroModal").style.display = "flex";
+    }
+
+    function cerrarRegistroModal() {
+      document.getElementById("registroModal").style.display = "none";
+    }
+
+    function redirigirALogin() {
+      if (window.location.pathname.includes("index.html") || window.location.pathname === "/" || window.location.pathname.endsWith("/")) {
+        mostrarLoginModal();
+      } else {
+        localStorage.setItem("abrirLogin", "true");
+        window.location.href = "index.html";
+      }
+    }
+
+    function redirigirARegistro() {
+      if (window.location.pathname.includes("index.html") || window.location.pathname === "/" || window.location.pathname.endsWith("/")) {
+        mostrarRegistroModal();
+      } else {
+        localStorage.setItem("abrirRegistro", "true");
+        window.location.href = "index.html";
+      }
+    }
+
+    document.getElementById("login-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("Credenciales incorrectas");
+        return response.json();
+      })
+      .then(data => {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", data.username); // ← Guardamos el username
+        alert("Inicio de sesión exitoso.");
+        cerrarLoginModal();
+        location.reload();
+      })
+      .catch(error => alert("Error al iniciar sesión: " + error.message));
+    });
+
+    document.getElementById("registro-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const username = document.getElementById("nuevo-username").value;
+      const email = document.getElementById("nuevo-email").value;
+      const password = document.getElementById("nuevo-password").value;
+
+      fetch("http://localhost:8080/api/auth/registro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("No se pudo registrar");
+        return response.json();
+      })
+      .then(() => {
+        alert("Usuario registrado exitosamente. Ahora puedes iniciar sesión.");
+        cerrarRegistroModal();
+      })
+      .catch(error => alert("Error al registrar: " + error.message));
+    });
+
+    function cerrarSesion() {
+      if (confirm("¿Deseas cerrar sesión?")) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        alert("Sesión cerrada correctamente.");
+        window.location.href = "index.html";
+      }
+    }
+
+    window.onclick = function(event) {
+      if (event.target === document.getElementById("loginModal")) cerrarLoginModal();
+      if (event.target === document.getElementById("registroModal")) cerrarRegistroModal();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const token = localStorage.getItem("token");
+      const username = localStorage.getItem("username");
+
+      if (token) {
+        document.getElementById("cerrarSesionBtn").style.display = "inline-block";
+        document.getElementById("btnLogin").classList.add("oculto");
+        document.getElementById("btnRegistro").classList.add("oculto");
+
+        if (username) {
+          const usuarioSpan = document.getElementById("usuarioLogueado");
+          usuarioSpan.textContent = `| Bienvenido, ${username}`;
+        }
+      }
+
+      if (localStorage.getItem("abrirLogin") === "true") {
+        localStorage.removeItem("abrirLogin");
+        mostrarLoginModal();
+      }
+
+      if (localStorage.getItem("abrirRegistro") === "true") {
+        localStorage.removeItem("abrirRegistro");
+        mostrarRegistroModal();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Productos</title>
+  <link rel="stylesheet" href="estilos.css" />
+  <style>
+    body {
+      background-image: url('img/banner.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: rgba(0, 0, 0, 0.85);
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      color: white;
+      margin: 0;
+      font-size: 28px;
+    }
+
+    nav {
+      margin-top: 10px;
+    }
+
+    nav a {
+      color: white;
+      margin-right: 15px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #ffd700;
+    }
+
+    #usuarioLogueado {
+      color: orange;
+      font-weight: bold;
+      margin-left: 20px;
+      font-size: 16px;
+      vertical-align: middle;
+    }
+
+    #btn-cerrar-sesion {
+      background-color: #cc0000;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: none;
+      margin-left: 10px;
+    }
+
+    .productos-container {
+      padding: 30px;
+    }
+
+    .productos-container h2 {
+      color: white;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 32px;
+    }
+
+    #lista-productos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 25px;
+    }
+
+    .producto-card {
+      background-color: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(6px);
+      border-radius: 15px;
+      padding: 15px;
+      color: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+      max-height: 470px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .producto-card:hover {
+      transform: scale(1.03);
+    }
+
+    .producto-card img {
+      width: auto;
+      max-width: 90%;
+      height: 120px;
+      object-fit: contain;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .producto-card h3 {
+      margin: 8px 0 4px;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .producto-card p {
+      margin: 0 0 8px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .producto-card input[type="number"] {
+      width: 55px;
+      padding: 4px;
+      margin: 5px;
+      border-radius: 5px;
+      border: none;
+      text-align: center;
+    }
+
+    .producto-card button {
+      background-color: #28a745;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+
+    .producto-card button:hover {
+      background-color: #218838;
+    }
+
+    footer {
+      background-color: rgba(0, 0, 0, 0.75);
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Tienda Virtual de Bebidas Artesanales</h1>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="productos.html">Productos</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="carrito.html">🛒 Carrito</a>
+      
+      <span id="usuarioLogueado"></span>
+      
+      <a href="#" id="link-login" onclick="redirigirALogin()">Iniciar Sesión</a>
+      <a href="#" id="link-registro" onclick="redirigirARegistro()">Crear Cuenta</a>
+      <button id="btn-cerrar-sesion" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="productos-container">
+      <h2>Nuestros Productos</h2>
+      <div id="lista-productos"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Tienda Virtual de Bebidas Alcohólicas. Todos los derechos reservados. RICARDO RAMOS</p>
+  </footer>
+
+  <script>
+    let productos = [];
+
+    async function obtenerProductos() {
+      try {
+        const response = await fetch("http://localhost:8080/api/productos");
+        if (!response.ok) throw new Error("No se pudo obtener productos");
+        productos = await response.json();
+        mostrarProductos();
+      } catch (error) {
+        console.error(error);
+        alert("Error al cargar los productos desde el servidor.");
+      }
+    }
+
+    function mostrarProductos() {
+      const contenedor = document.getElementById("lista-productos");
+      contenedor.innerHTML = "";
+
+      productos.forEach((producto, index) => {
+        let imagenSrc = producto.imagen && producto.imagen.trim() !== ''
+                        ? `img/${producto.imagen}`
+                        : 'img/default.png';
+
+        const div = document.createElement("div");
+        div.className = "producto-card";
+
+        div.innerHTML = `
+          <img src="${producto.imagen}" alt="${producto.nombre}">
+          <h3>${producto.nombre}</h3>
+          <p>${producto.descripcion || ''}</p>
+          <p>Tipo: ${producto.tipo || 'Bebida'}</p>
+          <p>Precio: $${producto.precio.toFixed(2)}</p>
+          <p>Stock disponible: ${producto.stock}</p>
+        `;
+
+        if (producto.stock > 0) {
+          div.innerHTML += `
+            <label for="cantidad-${index}">Cantidad:</label>
+            <input type="number" id="cantidad-${index}" min="1" max="${producto.stock}" value="1">
+            <br>
+            <button onclick="agregarAlCarrito(${index})">Agregar al Carrito</button>
+          `;
+        } else {
+          div.innerHTML += `<p style="color: #ff4444; font-weight: bold; font-size: 15px; margin-top: 10px;">¡Agotado!</p>`;
+        }
+
+        contenedor.appendChild(div);
+      });
+    }
+
+    function agregarAlCarrito(index) {
+      const cantidadInput = document.getElementById(`cantidad-${index}`);
+      const cantidad = parseInt(cantidadInput.value);
+      const productoSeleccionado = productos[index];
+
+      if (isNaN(cantidad) || cantidad < 1) {
+        alert("La cantidad debe ser al menos 1.");
+        return;
+      }
+
+      if (cantidad > productoSeleccionado.stock) {
+        alert(`No puedes agregar más de lo disponible. Solo hay ${productoSeleccionado.stock} en stock de "${productoSeleccionado.nombre}".`);
+        return;
+      }
+
+      const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+      const existente = carrito.find(p => p.id === productoSeleccionado.id);
+
+      if (existente) {
+        const nuevaCantidad = existente.cantidad + cantidad;
+        if (nuevaCantidad > productoSeleccionado.stock) {
+          alert(`Ya tienes ${existente.cantidad} en el carrito. Solo puedes agregar ${productoSeleccionado.stock - existente.cantidad} más de "${productoSeleccionado.nombre}".`);
+          return;
+        }
+        existente.cantidad += cantidad;
+      } else {
+        carrito.push({
+          id: productoSeleccionado.id,
+          nombre: productoSeleccionado.nombre,
+          precio: productoSeleccionado.precio,
+          cantidad: cantidad,
+          imagen: productoSeleccionado.imagen
+        });
+      }
+
+      localStorage.setItem("carrito", JSON.stringify(carrito));
+      alert(`${productoSeleccionado.nombre} agregado al carrito.`);
+    }
+
+    function cerrarSesion() {
+      if (confirm("¿Deseas cerrar sesión?")) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("username"); // borrar username también
+        alert("Sesión cerrada.");
+        window.location.href = "index.html";
+      }
+    }
+
+    function redirigirALogin() {
+      localStorage.setItem("abrirLogin", "true");
+      window.location.href = "index.html";
+    }
+
+    function redirigirARegistro() {
+      localStorage.setItem("abrirRegistro", "true");
+      window.location.href = "index.html";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const token = localStorage.getItem("token");
+      const username = localStorage.getItem("username");
+
+      if (token) {
+        document.getElementById("btn-cerrar-sesion").style.display = "inline-block";
+        document.getElementById("link-login").style.display = "none";
+        document.getElementById("link-registro").style.display = "none";
+
+        if (username) {
+          document.getElementById("usuarioLogueado").textContent = `| Bienvenido, ${username}`;
+        }
+      } else {
+        // Si no hay sesión, limpiar el saludo
+        document.getElementById("usuarioLogueado").textContent = "";
+      }
+
+      obtenerProductos();
+    });
+  </script>
+
+</body>
+</html>

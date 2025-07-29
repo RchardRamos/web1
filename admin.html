@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Administrador de Productos</title>
+  <link rel="stylesheet" href="estilos.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-image: url('img/banner.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      color: white;
+    }
+
+    .container {
+      background-color: rgba(0, 0, 0, 0.85);
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    form input, form button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    form input {
+      background-color: #222;
+      color: white;
+    }
+
+    form button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    form button:hover {
+      background-color: #45a049;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #555;
+    }
+
+    th {
+      background-color: #333;
+    }
+
+    tr:nth-child(even) {
+      background-color: #222;
+    }
+
+    tr:nth-child(odd) {
+      background-color: #111;
+    }
+
+    .acciones button {
+      background-color: crimson;
+      color: white;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+
+    .acciones button.modificar {
+      background-color: #FFA500;
+    }
+
+    .acciones button.modificar:hover {
+      background-color: #cc8400;
+    }
+
+    .acciones button:hover {
+      background-color: darkred;
+    }
+
+    img.producto-img {
+      width: 60px;
+      border-radius: 6px;
+    }
+
+    #modalEditar {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #modalEditar .modal-contenido {
+      background-color: #222;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      th {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+      }
+
+      td {
+        position: relative;
+        padding-left: 50%;
+        white-space: pre-wrap;
+      }
+
+      td:before {
+        position: absolute;
+        left: 10px;
+        font-weight: bold;
+      }
+
+      td:nth-child(1):before { content: "Nombre"; }
+      td:nth-child(2):before { content: "Precio"; }
+      td:nth-child(3):before { content: "Stock"; }
+      td:nth-child(4):before { content: "Tipo"; }
+      td:nth-child(5):before { content: "Imagen"; }
+      td:nth-child(6):before { content: "Acciones"; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Gestión de Productos</h1>
+
+    <h2>Agregar nuevo producto</h2>
+    <form id="formAgregarProducto">
+      <input type="text" id="nombre" placeholder="Nombre del producto" required />
+      <input type="text" id="descripcion" placeholder="Descripción" required />
+      <input type="number" id="precio" placeholder="Precio" min="0" required />
+      <input type="number" id="stock" placeholder="Stock disponible" min="0" required />
+      <input type="text" id="tipo" placeholder="Tipo de bebida" required />
+      <input type="text" id="imagen" placeholder="URL de imagen (opcional)" />
+      <button type="submit">Agregar Producto</button>
+    </form>
+
+    <h2>Lista de productos</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Tipo</th>
+          <th>Imagen</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaProductos"></tbody>
+    </table>
+  </div>
+
+  <!-- MODAL DE EDICIÓN -->
+  <div id="modalEditar">
+    <div class="modal-contenido">
+      <h2>Editar Producto</h2>
+      <form id="formEditarProducto">
+        <input type="hidden" id="edit-id" />
+        <input type="text" id="edit-nombre" placeholder="Nombre" required />
+        <input type="text" id="edit-descripcion" placeholder="Descripción" required />
+        <input type="number" id="edit-precio" placeholder="Precio" min="0" required />
+        <input type="number" id="edit-stock" placeholder="Stock" min="0" required />
+        <input type="text" id="edit-tipo" placeholder="Tipo" required />
+        <input type="text" id="edit-imagen" placeholder="URL Imagen" />
+        <div style="margin-top:10px;">
+          <button type="submit" style="background-color:#4CAF50; color:white; padding:10px; border:none; border-radius:6px;">Guardar Cambios</button>
+          <button type="button" onclick="cerrarModal()" style="background-color:crimson; color:white; padding:10px; border:none; border-radius:6px;">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('Acceso restringido. Inicia sesión como administrador.');
+      window.location.href = "index.html";
+    }
+
+    const tabla = document.getElementById("tablaProductos");
+
+    function cargarProductos() {
+      fetch('http://localhost:8080/api/productos', {
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+      .then(res => res.json())
+      .then(productos => {
+        tabla.innerHTML = '';
+        productos.forEach(prod => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${prod.nombre}</td>
+            <td>$${prod.precio.toFixed(2)}</td>
+            <td>${prod.stock}</td>
+            <td>${prod.tipo}</td>
+            <td>${prod.imagen ? `<img src="${prod.imagen}" class="producto-img">` : 'Sin imagen'}</td>
+            <td class="acciones">
+              <button onclick="eliminarProducto(${prod.id})">Eliminar</button>
+              <button class="modificar" onclick="modificarProducto(${prod.id})">Modificar</button>
+            </td>
+          `;
+          tabla.appendChild(tr);
+        });
+      })
+      .catch(() => {
+        alert("No se pudieron cargar los productos. Verifica el servidor.");
+      });
+    }
+
+    cargarProductos();
+
+    document.getElementById("formAgregarProducto").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const nuevo = {
+        nombre: document.getElementById("nombre").value.trim(),
+        descripcion: document.getElementById("descripcion").value.trim(),
+        precio: parseFloat(document.getElementById("precio").value),
+        stock: parseInt(document.getElementById("stock").value),
+        tipo: document.getElementById("tipo").value.trim(),
+        imagen: document.getElementById("imagen").value.trim()
+      };
+
+      if (nuevo.precio < 0 || nuevo.stock < 0) {
+        alert("Precio y stock deben ser mayores o iguales a 0.");
+        return;
+      }
+
+      fetch('http://localhost:8080/api/productos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(nuevo)
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(err => {
+            throw new Error(err.message || 'Error al agregar producto');
+          });
+        }
+        return response.json();
+      })
+      .then(() => {
+        alert("Producto agregado correctamente");
+        this.reset();
+        cargarProductos();
+      })
+      .catch(err => alert("Error: " + err.message));
+    });
+
+    function eliminarProducto(id) {
+      if (!confirm("¿Estás seguro de eliminar este producto?")) return;
+
+      fetch(`http://localhost:8080/api/productos/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("No se pudo eliminar el producto.");
+        }
+        alert("Producto eliminado correctamente.");
+        cargarProductos();
+      })
+      .catch(err => alert("Error: " + err.message));
+    }
+
+    function modificarProducto(id) {
+      fetch(`http://localhost:8080/api/productos/${id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("No se pudo obtener el producto.");
+        return response.json();
+      })
+      .then(prod => {
+        document.getElementById("edit-id").value = prod.id;
+        document.getElementById("edit-nombre").value = prod.nombre;
+        document.getElementById("edit-descripcion").value = prod.descripcion;
+        document.getElementById("edit-precio").value = prod.precio;
+        document.getElementById("edit-stock").value = prod.stock;
+        document.getElementById("edit-tipo").value = prod.tipo;
+        document.getElementById("edit-imagen").value = prod.imagen;
+        document.getElementById("modalEditar").style.display = "flex";
+      })
+      .catch(err => alert("Error: " + err.message));
+    }
+
+    function cerrarModal() {
+      document.getElementById("modalEditar").style.display = "none";
+    }
+
+    document.getElementById("formEditarProducto").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const id = document.getElementById("edit-id").value;
+      const productoEditado = {
+        id: id,
+        nombre: document.getElementById("edit-nombre").value.trim(),
+        descripcion: document.getElementById("edit-descripcion").value.trim(),
+        precio: parseFloat(document.getElementById("edit-precio").value),
+        stock: parseInt(document.getElementById("edit-stock").value),
+        tipo: document.getElementById("edit-tipo").value.trim(),
+        imagen: document.getElementById("edit-imagen").value.trim()
+      };
+
+      fetch(`http://localhost:8080/api/productos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(productoEditado)
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("No se pudo modificar el producto.");
+        alert("Producto actualizado correctamente.");
+        cerrarModal();
+        cargarProductos();
+      })
+      .catch(err => alert("Error: " + err.message));
+    });
+  </script>
+</body>
+</html>

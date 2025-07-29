@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inicio</title>
+  <link rel="stylesheet" href="estilos.css" />
+  <script src="auth.js" defer></script>
+  <style>
+    body {
+      background-image: url('img/banner.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      background-color: rgba(0, 0, 0, 0.85);
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav a, nav button {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    nav button {
+      background-color: #cc0000;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    nav button:hover {
+      background-color: #a30000;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 15px black;
+      text-align: center;
+    }
+
+    .modal-content h2 {
+      margin-bottom: 20px;
+    }
+
+    .modal-content input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .modal-content button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .close {
+      float: right;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Inicio</h1>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a onclick="redirigirALogin()">Iniciar Sesión</a>
+      <a href="registro.html">Crear Cuenta</a>
+      <a href="productos.html">Productos</a>
+      <a href="carrito.html">Carrito</a>
+      <button id="cerrarSesionBtn" onclick="cerrarSesion()" style="display: none;">Cerrar Sesión</button>
+    </nav>
+  </header>
+
+  <main style="text-align:center; color:white; padding:50px;">
+    <h2>Bienvenido a la Tienda Virtual de Bebidas Artesanales</h2>
+    <p>Selecciona una opción del menú para comenzar.</p>
+  </main>
+
+  <!-- Modal de inicio de sesión -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarLoginModal()">&times;</span>
+      <h2>Iniciar Sesión</h2>
+      <form id="login-form">
+        <input type="text" id="username" placeholder="Nombre de usuario" required><br>
+        <input type="password" id="password" placeholder="Contraseña" required><br>
+        <button type="submit">Ingresar</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Mostrar modal
+    function mostrarLoginModal() {
+      document.getElementById("loginModal").style.display = "flex";
+    }
+
+    // Cerrar modal
+    function cerrarLoginModal() {
+      document.getElementById("loginModal").style.display = "none";
+    }
+
+    // Cerrar modal si se hace clic fuera del contenido
+    window.onclick = function(event) {
+      const modal = document.getElementById("loginModal");
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    // Redirigir al login
+    function redirigirALogin() {
+      const enIndex = window.location.pathname.includes("index.html") || window.location.pathname === "/" || window.location.pathname.endsWith("/");
+      if (enIndex) {
+        mostrarLoginModal();
+      } else {
+        localStorage.setItem("abrirLogin", "true");
+        window.location.href = "index.html";
+      }
+    }
+
+    // Cerrar sesión
+    function cerrarSesion() {
+      if (confirm("¿Deseas cerrar sesión?")) {
+        localStorage.removeItem("token");
+        alert("Sesión cerrada correctamente.");
+        window.location.href = "index.html";
+      }
+    }
+
+    // Lógica de login
+    document.getElementById("login-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      fetch("http://localhost:8080/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password }) // Usamos username en lugar de email
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("Credenciales incorrectas");
+        return response.json();
+      })
+      .then(data => {
+        localStorage.setItem("token", data.token);
+        alert("Inicio de sesión exitoso.");
+        cerrarLoginModal();
+        location.reload(); // Recarga la página para aplicar cambios
+      })
+      .catch(error => {
+        alert("Error al iniciar sesión: " + error.message);
+      });
+    });
+
+    // Mostrar u ocultar botón de cerrar sesión
+    document.addEventListener("DOMContentLoaded", function () {
+      if (localStorage.getItem("token")) {
+        document.getElementById("cerrarSesionBtn").style.display = "inline-block";
+      }
+
+      if (localStorage.getItem("abrirLogin") === "true") {
+        localStorage.removeItem("abrirLogin");
+        mostrarLoginModal();
+      }
+    });
+  </script>
+</body>
+</html>

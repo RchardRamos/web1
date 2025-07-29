@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contacto - Tienda Virtual</title>
+  <link rel="stylesheet" href="estilos.css" />
+  <style>
+    body {
+      background-image: url('img/banner.jpg');
+      background-size: cover;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: rgba(0, 0, 0, 0.85);
+      padding: 20px;
+      color: white;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    nav {
+      margin-top: 10px;
+    }
+
+    nav a, nav button, nav span {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
+      font-weight: bold;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    #btnCerrarSesion {
+      background-color: #444;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .formulario {
+      background-color: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(6px);
+      color: white;
+      padding: 2rem;
+      border-radius: 15px;
+      max-width: 600px;
+      margin: 2rem auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .formulario h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .formulario input,
+    .formulario textarea {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .formulario button {
+      background-color: #28a745;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 1rem;
+      width: 100%;
+      transition: background-color 0.3s;
+    }
+
+    .formulario button:hover {
+      background-color: #218838;
+    }
+
+    .mensaje-exito {
+      display: none;
+      color: #00ff88;
+      margin-top: 1rem;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .info-contacto {
+      text-align: center;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 1.5rem;
+      border-radius: 12px;
+      max-width: 600px;
+      margin: 2rem auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    footer {
+      background-color: rgba(0, 0, 0, 0.85);
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Tienda Virtual de Bebidas Artesanales</h1>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <span id="nombreUsuario" style="color: orange; font-weight: bold; margin-left: 10px;"></span>
+      <a href="productos.html">Productos</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="carrito.html">🛒 Carrito</a>
+      <button id="btnCerrarSesion" onclick="cerrarSesion()" style="display: none;">Cerrar Sesión</button>
+    </nav>
+  </header>
+
+  <div class="formulario">
+    <h2>Contáctanos</h2>
+    <form id="form-contacto">
+      <input type="text" name="nombre" placeholder="Tu nombre" required autocomplete="name">
+      <input type="email" name="correo" placeholder="Tu correo electrónico" required autocomplete="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+      <input type="text" name="asunto" placeholder="Asunto" required>
+      <textarea name="mensaje" placeholder="Tu mensaje" rows="5" required></textarea>
+      <button type="submit">Enviar</button>
+    </form>
+    <div class="mensaje-exito" id="mensaje-exito">
+      ✅ ¡Gracias por contactarnos! Te responderemos pronto.
+    </div>
+  </div>
+
+  <div class="info-contacto">
+    <p><strong>Dirección:</strong> Los Ríos - Babahoyo - Ecuador</p>
+    <p><strong>Teléfono:</strong> 0991636811</p>
+    <p><strong>Correo:</strong> ricardoramosmontenegro@gmail.com</p>
+    <p><strong>Horario:</strong> Lunes a Viernes de 9:00 a 18:00</p>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("Debes iniciar sesión para acceder a esta página.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      document.getElementById("btnCerrarSesion").style.display = "inline-block";
+
+      // Decodificar token para obtener el nombre
+      const payloadBase64 = token.split('.')[1];
+      const payloadDecoded = JSON.parse(atob(payloadBase64));
+      const nombre = payloadDecoded.sub || "Usuario";
+
+      const spanNombre = document.getElementById("nombreUsuario");
+      spanNombre.textContent = ` | Bienvenido, ${nombre}`;
+
+      // Manejo del formulario
+      const form = document.getElementById("form-contacto");
+      form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        document.getElementById("mensaje-exito").style.display = "block";
+        this.reset();
+      });
+    });
+
+    function cerrarSesion() {
+      if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+        localStorage.removeItem("token");
+        alert("Sesión cerrada correctamente.");
+        window.location.href = "index.html";
+      }
+    }
+  </script>
+
+  <footer>
+    <p>© 2025 Tienda Virtual de Bebidas Alcohólicas. Todos los derechos reservados. RICARDO RAMOS</p>
+  </footer>
+
+</body>
+</html>
